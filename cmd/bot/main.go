@@ -17,7 +17,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	bot.Debug = true
+	//bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -34,8 +34,25 @@ func main() {
 		if update.Message == nil {
 			continue
 		}
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "You wrote: "+update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
-		bot.Send(msg)
+
+		switch update.Message.Command() {
+		case "help":
+			helpCommand(bot, update.Message)
+		default:
+			defaultBehavior(bot, update.Message)
+		}
+
 	}
+}
+
+func helpCommand(bot *tgbotapi.BotAPI, inputmsg *tgbotapi.Message) {
+	msg := tgbotapi.NewMessage(inputmsg.Chat.ID, "HELP!!")
+	msg.ReplyToMessageID = inputmsg.MessageID
+	bot.Send(msg)
+}
+
+func defaultBehavior(bot *tgbotapi.BotAPI, inputmsg *tgbotapi.Message) {
+	msg := tgbotapi.NewMessage(inputmsg.Chat.ID, "You wrote: "+inputmsg.Text)
+	msg.ReplyToMessageID = inputmsg.MessageID
+	bot.Send(msg)
 }
